@@ -1,0 +1,5 @@
+spring:
+  security:
+    user:
+      name: user        #spring-security 기본 아이디 설정
+      password: 1111    #spring-security 기본 비밀번호 설정
