@@ -86,5 +86,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .rememberMeParameter("remember")            // 기본 파라미터명 변경(기본값 : remember-me)
                 .tokenValiditySeconds(3600)                 // 기본값은 14일
                 .userDetailsService(userDetailsService);
+
+        /* 동시 세션 제어 */
+        http
+                .sessionManagement()                        // 세션 관리 기능 작동
+                .maximumSessions(1)                         // 최대 허용 가능 세션 수, -1로 설정 시 무제한 로그인 세션 허용
+                .maxSessionsPreventsLogin(false);           // true설정 시 동시 로그인 차단, false 설정 시 기존 세션 만료
+
+        /* 세션 고정 공격 방어 */
+        http
+                .sessionManagement()
+                .sessionFixation().changeSessionId();       // none : 아무런 조치를 하지 않음
+                                                            // changeSessionId : 기본값, 세션Id 변경
+                                                            // migrateSession : 새로운 세션Id 생성 및 발급하고 기존 세션의 값 사용 가능
+                                                            // newSession : 새로운 세션Id 생성 및 발급하고 기존 세션의 값 사용 불가
+
     }
 }
