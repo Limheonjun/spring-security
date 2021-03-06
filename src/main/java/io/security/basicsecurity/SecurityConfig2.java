@@ -6,6 +6,9 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
+import org.springframework.security.web.savedrequest.RequestCache;
+import org.springframework.security.web.savedrequest.SavedRequest;
 
 /**
  * 인가 관련 설정(역할-ROLL)
@@ -38,11 +41,30 @@ public class SecurityConfig2 extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
+                .antMatchers("/login").permitAll()
                 .antMatchers("/user").hasRole("USER")
                 .antMatchers("/admin/pay").hasRole("ADMIN") //구체적인 경로가 모든경로(**)설정보다 위에 와야함
                 .antMatchers("/admin/**").access("hasRole('ADMIN') or hasRole('SYS')")
                 .anyRequest().authenticated();
         http
-                .formLogin();
+                .formLogin()
+                .successHandler((request, response, authentication) -> {
+                    RequestCache requestCache = new HttpSessionRequestCache();  //인증 실패 시 이미 요청정보가 저장된 상태
+                    SavedRequest savedRequest = requestCache.getRequest(request, response);
+                    String redirectUrl = savedRequest.getRedirectUrl();
+                    response.sendRedirect(redirectUrl);
+                });
+
+        /* 인증 및 인가 예외 설정 */
+        http
+                .exceptionHandling()
+                //인증 예외
+//                .authenticationEntryPoint((request, response, authException) ->
+//                        response.sendRedirect("/login") //스프링 시큐리티가 제공하는 로그인 페이지가 아닌 직접 만든 로그인 페이지로 이동
+//                )
+                //인가 예외
+                .accessDeniedHandler((request, response, accessDeniedException) ->
+                        response.sendRedirect("/denied") //직접 만든 페이지로 이동
+                );
     }
 }
