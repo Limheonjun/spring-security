@@ -13,8 +13,8 @@ import org.springframework.security.web.savedrequest.SavedRequest;
 /**
  * 인가 관련 설정(역할-ROLL)
  */
-@Configuration
-@EnableWebSecurity
+//@Configuration
+//@EnableWebSecurity
 public class SecurityConfig2 extends WebSecurityConfigurerAdapter {
 
     // 사용자 생성 및 권한 설정 메소드
